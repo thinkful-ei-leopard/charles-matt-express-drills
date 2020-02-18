@@ -66,6 +66,57 @@ app.get('/cipher', (req, res) => {
 
 // Drill 3 - Lotto
 
+app.get('/lotto', (req, res) => {
+  const numbers = req.query.numbers;
+ 
+  if(!numbers){
+    res.status(400).json({message:'numbers is required'})
+  }
+  if(!Array.isArray(numbers)){
+    res.status(400).json({message:'numbers must be an array'})
+  }
+  if(numbers.length != 6){
+    res.status(400).json({message:'must be 6 numbers'})
+  }
+  const guesses = numbers.map(n => parseInt(n))
+
+  for(let i=0; i < guesses.length; i++){
+    let guess = guesses[i]
+    if(Number.isNaN(guess)){
+      res.status(400).json({message:'number array must only contain numbers'})
+    }
+
+    if(guess > 20 || guess < 1){
+      res.status(400).json({message:'each number should be between 1 and 20'})
+    }
+  }
+
+  let lottoNumbers = Array.from({length: 6}, () => Math.floor(Math.random() * 20));
+
+  let winningNumbers = lottoNumbers.filter(n => guesses.includes(n))
+  let response = ''
+
+  switch(winningNumbers.length) {
+    case 6: 
+      response = 'Wow! Unbelievable! You could have won the mega million'
+      break;
+  case 5:
+      response = 'Congratulations! You win $100!'
+      break;
+  case 4:
+      response = 'Congratulations, you win a free ticket'
+      break;
+  default:
+      response = 'Sorry, you lose'
+      break;
+  }
+
+  
+  res.status(200).json({response})
+
+}); 
+
+
 app.listen(8000, ()=> {
   console.log('server is listening on port 8000');
 });
